@@ -16,6 +16,8 @@ A specialized conversational AI assistant designed to help nonprofits and social
 
 🏗️ **[Architecture Documentation](docs/ARCHITECTURE.md)** - Technical architecture, design decisions, and system overview
 
+🧪 **[Testing Guide](docs/TESTING.md)** - Comprehensive testing strategy using traditional and AI evaluation tools
+
 ## Quick Start
 
 ### Prerequisites
@@ -112,6 +114,9 @@ mas-ai-assistant/
 - `npm run build` - Build production application
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run test` - Run traditional unit/integration tests
+- `npm run eval` - Run AI evaluation tests
+- `npm run test:all` - Run all tests (traditional + AI evaluation)
 
 ### CiviCRM Integration
 
