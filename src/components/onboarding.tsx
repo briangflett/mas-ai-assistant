@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, Users, Heart, Building, HelpCircle, ArrowRight, ArrowLeft, Sparkles, Mail, User, Lock, Globe } from 'lucide-react';
+import { MessageCircle, Users, Heart, Building, HelpCircle, ArrowRight, ArrowLeft, Sparkles, Mail, Lock, Globe } from 'lucide-react';
 
 export function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -164,7 +164,7 @@ export function Onboarding() {
             MAS AI Assistant
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Welcome! I'm here to help with nonprofit consulting, CiviCRM guidance, and organizational strategy.
+            Welcome! I&apos;m here to help with nonprofit consulting, CiviCRM guidance, and organizational strategy.
           </p>
         </div>
 
