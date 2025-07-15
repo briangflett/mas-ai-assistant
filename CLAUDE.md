@@ -60,17 +60,59 @@ npm run lint
 
 ## Environment Variables
 
-Required environment variables:
+Required environment variables stored in `.env.local`:
 - `ANTHROPIC_API_KEY`: Anthropic API key for Claude integration
+- `VERCEL_TOKEN`: Vercel deployment token for CLI operations
+
+## Authentication Protocol
+
+**IMPORTANT**: When encountering authentication issues with any tool or service:
+
+1. **STOP immediately** - Do not attempt workarounds
+2. **Ask Brian** for the appropriate token/credential
+3. **Save the token** in `.env.local` under the appropriate variable name
+4. **Load the token** using `source .env.local` or `export TOOL_TOKEN=$TOKEN`
+5. **Continue** with the operation using the authenticated tool
+
+### Common Authentication Tokens
+- **Vercel**: `VERCEL_TOKEN` for `vercel` CLI operations
+- **GitHub**: Usually handled by `gh auth login` or `GITHUB_TOKEN`
+- **Anthropic**: `ANTHROPIC_API_KEY` for API access
+- **OpenAI**: `OPENAI_API_KEY` for GPT integration
+
+### Usage Examples
+```bash
+# Load environment variables
+source .env.local
+
+# Use Vercel CLI with token
+vercel --token="$VERCEL_TOKEN" --prod --yes
+
+# Alternative: Export for session
+export VERCEL_TOKEN="your_token_here"
+vercel --prod --yes
+```
 
 ## Deployment
 
 Configured for **Vercel** deployment with:
 - 30-second timeout for chat API route
-- Environment variable mapping for Anthropic API key
+- Environment variables managed through Vercel dashboard
+- Automatic deployment on GitHub push
+- Manual deployment via `vercel --prod --yes`
 
 ## TypeScript Configuration
 
 - **Path aliases**: `@/*` maps to `./src/*`
 - **Strict mode** enabled
 - **Next.js plugin** for enhanced TypeScript support
+
+## AI Interaction Guidelines
+
+### API Call Handling
+- When an API4 call fails, **STOP** and request trying the operation through the UI
+- Always prioritize stable, user-friendly interaction methods
+
+### Conversation Memory
+- Continuously learn and adapt based on interaction context
+- Maintain focus on project goals and user requirements

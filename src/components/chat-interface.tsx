@@ -18,6 +18,11 @@ interface UserProfile {
   identification: string;
   email?: string;
   dataAccess: string[];
+  microsoftSession?: {
+    name?: string;
+    email?: string;
+    accessToken?: string;
+  } | null;
 }
 
 export function ChatInterface() {

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, Users, Heart, Building, HelpCircle, ArrowRight, ArrowLeft, Sparkles, Mail, Lock, Globe } from 'lucide-react';
+import { signIn, useSession } from 'next-auth/react';
 
 export function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -14,6 +15,36 @@ export function Onboarding() {
   const [email, setEmail] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Save onboarding state to localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('onboardingState');
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      setCurrentStep(state.currentStep || 1);
+      setSelectedRole(state.selectedRole || '');
+      setSelectedTopic(state.selectedTopic || '');
+      setCustomRole(state.customRole || '');
+      setCustomTopic(state.customTopic || '');
+      setIdentificationMethod(state.identificationMethod || '');
+      setEmail(state.email || '');
+    }
+  }, []);
+
+  // Save state whenever it changes
+  useEffect(() => {
+    const state = {
+      currentStep,
+      selectedRole,
+      selectedTopic,
+      customRole,
+      customTopic,
+      identificationMethod,
+      email
+    };
+    localStorage.setItem('onboardingState', JSON.stringify(state));
+  }, [currentStep, selectedRole, selectedTopic, customRole, customTopic, identificationMethod, email]);
 
   const roles = [
     {
@@ -87,12 +118,12 @@ export function Onboarding() {
     }
   };
 
-  const getDataAccess = () => {
+  const getDataAccess = useCallback(() => {
     if (selectedRole === 'mas-staff-vc' && identificationMethod === 'microsoft-login') {
       return ['Publicly Available', 'VC Templates', 'Project History'];
     }
     return ['Publicly available'];
-  };
+  }, [selectedRole, identificationMethod]);
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
@@ -115,7 +146,7 @@ export function Onboarding() {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     setIsTransitioning(true);
     
     const userProfile = {
@@ -124,16 +155,42 @@ export function Onboarding() {
       topic: selectedTopic,
       customTopic,
       identification: identificationMethod,
-      email,
-      dataAccess: getDataAccess()
+      email: identificationMethod === 'microsoft-login' ? session?.user?.email : email,
+      dataAccess: getDataAccess(),
+      microsoftSession: identificationMethod === 'microsoft-login' ? {
+        name: session?.user?.name,
+        email: session?.user?.email,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        accessToken: (session as any)?.accessToken
+      } : null
     };
 
     localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    localStorage.removeItem('onboardingState'); // Clear onboarding state
     
     setTimeout(() => {
       router.push('/chat');
     }, 2000);
-  };
+  }, [selectedRole, customRole, selectedTopic, customTopic, identificationMethod, email, session, router, getDataAccess]);
+
+  // Auto-proceed after Microsoft authentication
+  useEffect(() => {
+    console.log('Auto-proceed check:', {
+      identificationMethod,
+      hasSession: !!session,
+      status,
+      currentStep,
+      sessionUser: session?.user?.email
+    });
+    
+    if (identificationMethod === 'microsoft-login' && session && status === 'authenticated' && currentStep === 3) {
+      console.log('Auto-proceeding to chat...');
+      // User just authenticated with Microsoft, automatically proceed to chat
+      setTimeout(() => {
+        handleContinue();
+      }, 1500); // Small delay to show the success state
+    }
+  }, [session, status, identificationMethod, currentStep, handleContinue]);
 
   const canProceed = () => {
     switch (currentStep) {
@@ -142,7 +199,11 @@ export function Onboarding() {
       case 2:
         return selectedTopic && (!selectedTopic.includes('Other') || customTopic.trim());
       case 3:
-        return identificationMethod && (identificationMethod !== 'email' || email.trim());
+        return identificationMethod && (
+          identificationMethod === 'anonymous' || 
+          (identificationMethod === 'email' && email.trim()) ||
+          (identificationMethod === 'microsoft-login' && session)
+        );
       default:
         return false;
     }
@@ -355,6 +416,41 @@ export function Onboarding() {
                       placeholder="your.email@example.com"
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
+                  </div>
+                )}
+
+                {identificationMethod === 'microsoft-login' && (
+                  <div className="mt-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
+                    {!session ? (
+                      <div className="text-center">
+                        <p className="text-sm text-blue-700 mb-4">
+                          Sign in with your Microsoft account to access enhanced features
+                        </p>
+                        <button
+                          onClick={() => signIn('azure-ad', { callbackUrl: window.location.href })}
+                          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          <Lock className="h-4 w-4 mr-2" />
+                          Sign in with Microsoft
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <p className="text-sm text-green-700 mb-2">
+                          ✓ Signed in as {session.user?.email}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          You now have access to VC Templates and Project History
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
