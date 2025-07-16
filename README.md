@@ -9,6 +9,12 @@ A specialized conversational AI assistant designed to help nonprofits and social
 - **Dual LLM strategy** using Claude and OpenAI for optimal response quality
 - **Microsoft 365 authentication** for enhanced features and data access
 - **Intelligent context awareness** that adapts to your specific organizational needs
+- **Streaming responses** with token-by-token delivery for better user experience
+- **RAG (Retrieval-Augmented Generation)** with nonprofit knowledge base
+- **Modern AI SDK v5** integration with structured outputs and analytics
+- **Persistent chat history** with PostgreSQL database storage
+- **Message voting system** for continuous improvement
+- **Suggested actions** for nonprofit workflow optimization
 
 ## Documentation
 
@@ -17,6 +23,12 @@ A specialized conversational AI assistant designed to help nonprofits and social
 🏗️ **[Architecture Documentation](docs/ARCHITECTURE.md)** - Technical architecture, design decisions, and system overview
 
 🧪 **[Testing Guide](docs/TESTING.md)** - Comprehensive testing strategy using traditional and AI evaluation tools
+
+🚀 **[Modern AI Enhancements](docs/MODERN_AI_ENHANCEMENTS.md)** - Latest AI SDK v5 features, streaming, RAG, and analytics
+
+💬 **[Vercel Chatbot Features](docs/VERCEL_CHATBOT_FEATURES.md)** - Chat history, message voting, suggested actions, and analytics
+
+📋 **[Feature Backlog](docs/BACKLOG.md)** - Future enhancements and feature ideas organized by priority
 
 ## Quick Start
 
@@ -117,6 +129,9 @@ mas-ai-assistant/
 - `npm run test` - Run traditional unit/integration tests
 - `npm run eval` - Run AI evaluation tests
 - `npm run test:all` - Run all tests (traditional + AI evaluation)
+- `npm run db:generate` - Generate database migration files
+- `npm run db:migrate` - Apply database migrations
+- `npm run db:studio` - Open database management interface
 
 ### CiviCRM Integration
 
